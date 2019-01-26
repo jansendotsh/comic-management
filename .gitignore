@@ -1,0 +1,5 @@
+*.cbr
+*.cbz
+*.pyc
+_pycache_/*
+comictaggerlib/__init__.pyc
