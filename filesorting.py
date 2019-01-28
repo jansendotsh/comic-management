@@ -34,7 +34,9 @@ def main():
         comicPublisher = comicInfo.Publisher.cdata
         comicDate = datetime.date(int(comicInfo.Year.cdata), int(comicInfo.Month.cdata), 1)
 
+        # This is just to show that the values are working. Leaving while working on folder creation
         print("The comic in question is nummber %s of %s and was published by %s in %s, %s." % (comicNumber, comicSeries, comicPublisher, comicDate.strftime('%B'), comicDate.strftime('%Y')))
+
         # Create folder
 
         # Move file to newly formed folder
