@@ -44,8 +44,6 @@ def main():
                 zipped.extract(i, workdir)
         
         # Load XML file into Python
-        # Include RaiseError here in case there is no ComicInfo.xml -- Potentially write file names to stdout?
-        
         try:
             comicParser()
 
