@@ -15,8 +15,8 @@ def main():
     # Final directory for files to move
     finalDirectory = "/mnt/c/Users/janseng/Documents/comicScript"
 
-    for file in glob.glob("*.cbz"):
-        zipped = zipfile.ZipFile(file)
+    for comicFile in glob.glob("*.cbz"):
+        zipped = zipfile.ZipFile(comicFile)
 
         # Extract ComicInfo.xml
         for i in zipped.namelist():
@@ -25,24 +25,28 @@ def main():
         
         # Load XML file into Python
         # Include RaiseError here in case there is no ComicInfo.xml -- Potentially write file names to stdout?
-        comicInfo = untangle.parse("ComicInfo.xml").ComicInfo
+        
+        try:
+            comicInfo = untangle.parse("ComicInfo.xml").ComicInfo
 
-        # Set essential values
-        comicVolume = comicInfo.Volume.cdata
-        comicSeries = comicInfo.Series.cdata
-        comicNumber = comicInfo.Number.cdata
-        comicPublisher = comicInfo.Publisher.cdata
-        comicDate = datetime.date(int(comicInfo.Year.cdata), int(comicInfo.Month.cdata), 1)
+            # Set essential values
+            comicVolume = comicInfo.Volume.cdata
+            comicSeries = comicInfo.Series.cdata
+            comicNumber = comicInfo.Number.cdata
+            comicPublisher = comicInfo.Publisher.cdata
+            comicDate = datetime.date(int(comicInfo.Year.cdata), int(comicInfo.Month.cdata), 1)
 
-        # This is just to show that the values are working. Leaving while working on folder creation
-        print("The comic in question is nummber %s of %s and was published by %s in %s, %s." % (comicNumber, comicSeries, comicPublisher, comicDate.strftime('%B'), comicDate.strftime('%Y')))
+            # This is just to show that the values are working. Leaving while working on folder creation
+            print("The comic in question is nummber %s of %s and was published by %s in %s, %s." % (comicNumber, comicSeries, comicPublisher, comicDate.strftime('%B'), comicDate.strftime('%Y')))
 
-        # Create folder
+            # Create folder
 
-        # Move file to newly formed folder
+            # Move file to newly formed folder
 
-        # Cleaning up ComicInfo.xml work is done
-        os.remove("ComicInfo.xml")
+            # Cleaning up ComicInfo.xml work is done
+            os.remove("ComicInfo.xml") 
+        except:
+            print("%s does not have proper tags." % (comicFile))
 
 if __name__ == '__main__':
    main() 
