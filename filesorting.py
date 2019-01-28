@@ -4,6 +4,26 @@ import glob, os, subprocess, shutil, zipfile, untangle
 import datetime
 from sys import argv
 
+def comicParser():
+    comicInfo = untangle.parse("ComicInfo.xml").ComicInfo
+
+    # Set essential values
+    comicVolume = comicInfo.Volume.cdata
+    comicSeries = comicInfo.Series.cdata
+    comicNumber = comicInfo.Number.cdata
+    comicPublisher = comicInfo.Publisher.cdata
+    comicDate = datetime.date(int(comicInfo.Year.cdata), int(comicInfo.Month.cdata), 1)
+
+    # This is just to show that the values are working. Leaving while working on folder creation
+    print("The comic in question is nummber %s of %s and was published by %s in %s, %s." % (comicNumber, comicSeries, comicPublisher, comicDate.strftime('%B'), comicDate.strftime('%Y')))
+
+    # Create folder
+
+    # Move file to newly formed folder
+
+    # Cleaning up ComicInfo.xml work is done
+    os.remove("ComicInfo.xml")
+
 def main():
     # Grab working directory
     try:
@@ -27,26 +47,11 @@ def main():
         # Include RaiseError here in case there is no ComicInfo.xml -- Potentially write file names to stdout?
         
         try:
-            comicInfo = untangle.parse("ComicInfo.xml").ComicInfo
+            comicParser()
 
-            # Set essential values
-            comicVolume = comicInfo.Volume.cdata
-            comicSeries = comicInfo.Series.cdata
-            comicNumber = comicInfo.Number.cdata
-            comicPublisher = comicInfo.Publisher.cdata
-            comicDate = datetime.date(int(comicInfo.Year.cdata), int(comicInfo.Month.cdata), 1)
-
-            # This is just to show that the values are working. Leaving while working on folder creation
-            print("The comic in question is nummber %s of %s and was published by %s in %s, %s." % (comicNumber, comicSeries, comicPublisher, comicDate.strftime('%B'), comicDate.strftime('%Y')))
-
-            # Create folder
-
-            # Move file to newly formed folder
-
-            # Cleaning up ComicInfo.xml work is done
-            os.remove("ComicInfo.xml") 
         except:
             print("%s does not have proper tags." % (comicFile))
+            # Include a print to failedTags.txt
 
 if __name__ == '__main__':
    main() 
