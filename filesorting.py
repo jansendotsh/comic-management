@@ -4,8 +4,14 @@ import glob, os, subprocess, shutil, zipfile, untangle
 import datetime
 from sys import argv
 
-def comicParser():
-    comicInfo = untangle.parse("ComicInfo.xml").ComicInfo
+finalRoot = "/home/garrett/Documents/Comics"
+
+def comicParser(comicFile):
+    try:
+        comicInfo = untangle.parse("ComicInfo.xml").ComicInfo
+    except:
+        print("%s does not have proper tags." % (comicFile))
+        # Include a print to failedTags.txt
 
     # Set essential values
     comicVolume = comicInfo.Volume.cdata
@@ -25,7 +31,7 @@ def comicParser():
 
     # Create folder
     comicPath = os.path.join(finalRoot, comicPublisher, comicSeries + " (" + comicDate.strftime('%Y') + ")")
-    comicName = comicSeries + " #" + comicNumber.zfill(3) + " (" + comicDate('%B, %Y') + ").cbz"
+    comicName = comicSeries + " #" + comicNumber.zfill(3) + " (" + comicDate.strftime('%B, %Y') + ").cbz"
 
     if not os.path.exists:
         try:
@@ -35,7 +41,8 @@ def comicParser():
             return
 
     # Move file to newly formed folder
-    if not os.isfile.exists(os.path.join(comicPath, comicName)):
+    if not os.path.isfile(os.path.join(comicPath, comicName)):
+        # This is broken... Need to test
         shutil.move(os.path.abspath(comicFile), os.path.join(comicPath, comicName))
 
     # Cleaning up ComicInfo.xml work is done
@@ -50,11 +57,7 @@ def main():
         workdir = os.getcwd()
 
     # Final directory for files to move
-    try:
-        finalRoot = argv[2]
-    except IndexError:
-        finalRoot = os.getcwd()
-
+    
     for comicFile in glob.glob("*.cbz"):
         zipped = zipfile.ZipFile(comicFile)
 
@@ -64,12 +67,7 @@ def main():
                 zipped.extract(i, workdir)
         
         # Load XML file into Python
-        try:
-            comicParser()
-
-        except:
-            print("%s does not have proper tags." % (comicFile))
-            # Include a print to failedTags.txt
+        comicParser(comicFile)
 
 if __name__ == '__main__':
    main() 
