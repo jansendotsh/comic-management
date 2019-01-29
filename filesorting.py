@@ -4,9 +4,7 @@ import glob, os, subprocess, shutil, zipfile, untangle
 import datetime
 from sys import argv
 
-finalRoot = "/home/garrett/Documents/Comics"
-
-def comicParser(comicFile):
+def comicParser(comicFile, finalRoot):
     try:
         comicInfo = untangle.parse("ComicInfo.xml").ComicInfo
     except:
@@ -30,10 +28,10 @@ def comicParser(comicFile):
         comicSeries = comicSeries.replace("?", "")
 
     # Create folder
-    comicPath = os.path.join(finalRoot, comicPublisher, comicSeries + " (" + comicDate.strftime('%Y') + ")")
+    comicPath = os.path.join(finalRoot, comicPublisher, comicSeries + " (" + comicVolume + ")")
     comicName = comicSeries + " #" + comicNumber.zfill(3) + " (" + comicDate.strftime('%B, %Y') + ").cbz"
 
-    if not os.path.exists:
+    if not os.path.exists(comicPath):
         try:
             os.makedirs(comicPath)
         except: 
@@ -57,6 +55,7 @@ def main():
         workdir = os.getcwd()
 
     # Final directory for files to move
+    finalRoot = "/mnt/c/Users/janseng/Documents/Comics/"
     
     for comicFile in glob.glob("*.cbz"):
         zipped = zipfile.ZipFile(comicFile)
@@ -67,7 +66,9 @@ def main():
                 zipped.extract(i, workdir)
         
         # Load XML file into Python
-        comicParser(comicFile)
+        comicParser(comicFile, finalRoot)
+
+        print("File stowed.\n")
 
 if __name__ == '__main__':
    main() 

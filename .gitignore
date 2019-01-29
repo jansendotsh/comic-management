@@ -3,3 +3,9 @@
 *.pyc
 _pycache_/*
 comictaggerlib/__init__.pyc
+lib/*
+bin/*
+share/*
+lib64
+pyvenv.cfg
+.vscode/*
