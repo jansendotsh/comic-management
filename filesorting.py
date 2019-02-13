@@ -4,12 +4,20 @@ import glob, os, subprocess, shutil, zipfile, untangle
 import datetime
 from sys import argv
 
+# Define logging variable
+tagError = open("sortingErr.log", "a+")
+currentDT = datetime.datetime.now()
+
+# Final directory for files to move
+finalRoot = "/home/garrett/Comics/"
+
 def comicParser(comicFile, finalRoot):
     try:
         comicInfo = untangle.parse("ComicInfo.xml").ComicInfo
+
     except:
         print("%s does not have proper tags." % (comicFile))
-        # Include a print to failedTags.txt
+        tagError.write(str(currentDT) + " - " + comicFile + " does not have tags, not successful.\n")
 
     # Set essential values
     comicVolume = comicInfo.Volume.cdata
@@ -26,6 +34,14 @@ def comicParser(comicFile, finalRoot):
         comicSeries = comicSeries.replace(":", " -")
         comicSeries = comicSeries.replace("/", "-")
         comicSeries = comicSeries.replace("?", "")
+    
+    # Check variables, set empty to avoid errors while logging any missing tags
+    for tag in comicVolume, comicSeries, comicNumber, comicPublisher, comicDate:
+        try:
+            tag
+        except NameError:
+            tag = None
+            tagError.write(str(currentDT) + " - " + comicFile + " missing tag, replaced with empty tag. Review is recommended.\n" )
 
     # Create folder
     comicPath = os.path.join(finalRoot, comicPublisher, comicSeries + " (" + comicVolume + ")")
@@ -40,11 +56,13 @@ def comicParser(comicFile, finalRoot):
 
     # Move file to newly formed folder
     if not os.path.isfile(os.path.join(comicPath, comicName)):
-        # This is broken... Need to test
         shutil.move(os.path.abspath(comicFile), os.path.join(comicPath, comicName))
 
     # Cleaning up ComicInfo.xml work is done
-    os.remove("ComicInfo.xml")
+    if os.file.exists("ComicInfo.xml"):
+        os.remove("ComicInfo.xml")
+    
+    print("File stowed.\n")
 
 def main():
     # Grab working directory
@@ -53,10 +71,9 @@ def main():
         os.chdir(workdir)
     except IndexError:
         workdir = os.getcwd()
-
-    # Final directory for files to move
-    finalRoot = "/mnt/c/Users/janseng/Documents/Comics/"
     
+    # Possibly prompt for finaldir/workingdir here if undefined?
+
     for comicFile in glob.glob("*.cbz"):
         zipped = zipfile.ZipFile(comicFile)
 
@@ -64,11 +81,8 @@ def main():
         for i in zipped.namelist():
             if i.endswith("ComicInfo.xml"):
                 zipped.extract(i, workdir)
-        
-        # Load XML file into Python
-        comicParser(comicFile, finalRoot)
 
-        print("File stowed.\n")
+        comicParser(comicFile, finalRoot)
 
 if __name__ == '__main__':
    main() 
