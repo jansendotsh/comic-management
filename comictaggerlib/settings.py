@@ -103,7 +103,7 @@ class ComicTaggerSettings:
         self.use_series_start_as_volume = True
         self.clear_form_before_populating_from_cv = False
         self.remove_html_tables = False
-        self.cv_api_key = "f87ca8c5c840eecaffd0ae176530aa82386b4f0a"
+        self.cv_api_key = ""
 
         # CBL Tranform settings
 
