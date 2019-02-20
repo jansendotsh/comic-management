@@ -4,7 +4,7 @@ import glob, os, subprocess, shutil
 from sys import argv
 
 try:
-    workdir = argv[1]
+    workdir = os.path.abspath(argv[1])
     os.chdir(workdir)
 except IndexError:
     workdir = os.getcwd()
