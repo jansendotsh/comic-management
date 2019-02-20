@@ -4,20 +4,23 @@ import glob, os, subprocess, shutil, zipfile, untangle
 import datetime
 from sys import argv
 
-# Define logging variable
-tagError = open("sortingErr.log", "a+")
-currentDT = datetime.datetime.now()
-
 # Final directory for files to move
 finalRoot = "/home/garrett/Comics/"
 
-def comicParser(comicFile, finalRoot):
+def comicParser(comicFile, finalRoot, workDir):
+    zipped = zipfile.ZipFile(comicFile)
+
+    # Extract ComicInfo.xml
+    for i in zipped.namelist():
+        if i.endswith("ComicInfo.xml"):
+            zipped.extract(i, workDir)
     try:
         comicInfo = untangle.parse("ComicInfo.xml").ComicInfo
 
     except:
-        print("%s does not have proper tags." % (comicFile))
-        tagError.write(str(currentDT) + " - " + comicFile + " does not have tags, not successful.\n")
+        print("%s does not have proper tags.\n" % (comicFile))
+        comicError(comicFile, "tagErr")
+        return
 
     # Set essential values
     comicVolume = comicInfo.Volume.cdata
@@ -27,7 +30,7 @@ def comicParser(comicFile, finalRoot):
     comicDate = datetime.date(int(comicInfo.Year.cdata), int(comicInfo.Month.cdata), 1)
 
     # This is just to show that the values are working. Leaving while working on folder creation
-    print("Currently sorting %s of %s, published by %s in %s, %s." % (comicNumber, comicSeries, comicPublisher, comicDate.strftime('%B'), comicDate.strftime('%Y')))
+    print("Currently sorting %s of %s, published by %s in %s, %s.\n" % (comicNumber, comicSeries, comicPublisher, comicDate.strftime('%B'), comicDate.strftime('%Y')))
 
     # Fixing series name conflicts
     if comicSeries is not None:
@@ -41,7 +44,7 @@ def comicParser(comicFile, finalRoot):
             tag
         except NameError:
             tag = None
-            tagError.write(str(currentDT) + " - " + comicFile + " missing tag, replaced with empty tag. Review is recommended.\n" )
+            comicError(comicFile, "emptyValueErr")
 
     # Create folder
     comicPath = os.path.join(finalRoot, comicPublisher, comicSeries + " (" + comicVolume + ")")
@@ -59,30 +62,31 @@ def comicParser(comicFile, finalRoot):
         shutil.move(os.path.abspath(comicFile), os.path.join(comicPath, comicName))
 
     # Cleaning up ComicInfo.xml work is done
-    if os.file.exists("ComicInfo.xml"):
+    if os.path.isfile("ComicInfo.xml"):
         os.remove("ComicInfo.xml")
     
     print("File stowed.\n")
 
+def comicError(comicFile, errType):
+    currentDT = datetime.datetime.now()
+    errorLogging = open("comicErr.log", "a+")
+
+    if errType == "tagErr":
+        errorLogging.write("%s - %s does not have tags, not successful.\n" % (str(currentDT), comicFile))
+    
+    if errType == "emptyValueErr":
+        errorLogging.write("%s - %s has an empty tag field, review recommended.\n" % (str(currentDT), comicFile))
+
 def main():
     # Grab working directory
     try:
-        workdir = argv[1]
+        workdir = os.path.abspath(argv[1])
         os.chdir(workdir)
     except IndexError:
         workdir = os.getcwd()
     
-    # Possibly prompt for finaldir/workingdir here if undefined?
-
     for comicFile in glob.glob("*.cbz"):
-        zipped = zipfile.ZipFile(comicFile)
-
-        # Extract ComicInfo.xml
-        for i in zipped.namelist():
-            if i.endswith("ComicInfo.xml"):
-                zipped.extract(i, workdir)
-
-        comicParser(comicFile, finalRoot)
+        comicParser(comicFile, finalRoot, workdir)
 
 if __name__ == '__main__':
    main() 
