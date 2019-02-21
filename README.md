@@ -2,16 +2,16 @@
 ## About:
 This is a repository with a series of tools that are built to help with sorting and managing digital comic book files (.cbr, .cbz). Of these tools are the following:
 
-* conversion-linux.py:
+* **conversion-linux.py:**
 A small script that converts CBR files to CBZ on Linux and Unix-like systems using unrar-free.
 
-* conversion-win.py:
+* **conversion-win.py:**
 A similar small script that converts CBR files to CBZ on Windows systems using the 7-Zip executable.
 
-* comictagger:
+* **comictagger:**
 An existing comic tagging library that interfaces with ComicVine's API and tags in an XML file. More information is available [here](https://github.com/davide-romanini/comictagger/).
 
-* filesorting.py:
+* **filesorting.py:**
 A script that reads ComicRack format tags from ComicTagger and sorts into appropriate folders formatted as `%Publisher%/%series% (%volume%)/%series% %number (%month%, %year%)` An example of this is `Black Hammer #001.cbz` being moved and renamed to `Dark Horse Comics/Black Hammer (2016)/Black Hammer #001 (July, 2016).cbz` The formatting of sorting is hard coded although can be changed.
 
 ## Requirements:
