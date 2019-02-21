@@ -31,7 +31,7 @@ A script that reads ComicRack format tags from ComicTagger and sorts into approp
 * source bin/activate
 * python3 -m pip install -r requirements.txt
 
-Is able to be used without virtualenv although you will need to assess the versions of libraries used.
+These tools able to be used without virtualenv although you will need to assess the versions of libraries used.
 
 ## Usage
 
