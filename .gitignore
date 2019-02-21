@@ -3,6 +3,7 @@
 *.pyc
 _pycache_/*
 comictaggerlib/__init__.pyc
+include/*
 lib/*
 bin/*
 share/*
