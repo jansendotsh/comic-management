@@ -54,7 +54,6 @@ def main():
     workDir = None
     taskConv = False
 
-  
     if len(argv) == 1:
         print("No options. Run with --help for more info.")
         exit()
