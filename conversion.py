@@ -4,6 +4,23 @@ import glob, os, shutil, zipfile, untangle, datetime, getopt
 from sys import argv
 from unrar import rarfile
 
+helpText ='''
+A script for converting CBR files to a CBZ format for openness.
+
+Usage:
+
+-c --convert
+    Grab all CBR files in directory and convert them to CBZ format with checks
+
+-h --help
+    Print this message
+        
+Options:
+
+-i --inputdir=
+    The directory to search for files. If not set, will use current directory.
+'''
+
 def unpackRar(comicFile, dirPath):
     if rarfile.is_rarfile(comicFile):
         rar = rarfile.RarFile(comicFile)
@@ -37,22 +54,7 @@ def main():
     workDir = None
     taskConv = False
 
-    helpText ='''A script for converting CBR files to a CBZ format for openness.
-
-Usage:
-
--c --convert
-    Grab all CBR files in directory and convert them to CBZ format with checks
-
--h --help
-    Print this message
-        
-Options:
-
--i --inputdir=
-    The directory to search for files. If not set, will use current directory.
-'''
-
+  
     if len(argv) == 1:
         print("No options. Run with --help for more info.")
         exit()
