@@ -26,10 +26,10 @@ A script that reads ComicRack format tags from ComicTagger and sorts into approp
 ## Preparation
 
 * Clone repository
-* cd comic-management
-* virtualenv .
-* source bin/activate
-* python3 -m pip install -r requirements.txt
+* `cd comic-management`
+* `virtualenv .`
+* `source bin/activate`
+* `python3 -m pip install -r requirements.txt`
 
 These tools able to be used without virtualenv although you will need to assess the versions of libraries used.
 
