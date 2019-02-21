@@ -5,6 +5,9 @@
 
 This is a repository with a series of tools that are built to help with sorting and managing digital comic book files (.cbr, .cbz). Of these tools are the following:
 
+* **conversion.py:**
+A script for converting CBR files to CBZ. *Should* work across platform yet has only been tested on Linux.
+
 * **conversion-linux.py:**
 A small script that converts CBR files to CBZ on Linux and Unix-like systems using unrar-free.
 
@@ -20,8 +23,8 @@ A script that reads ComicRack format tags from ComicTagger and sorts into approp
 ## Requirements
 
 * Python 3
-* For OS-specific conversion: unrar-free (Linux/Unix-like) or 7-Zip (Windows)
 * For agonstic conversion: libunrar or [UnRARDLL.exe](http://www.rarlab.com/rar/UnRARDLL.exe), more info [here](https://www.rarlab.com/rar_add.htm)
+* For OS-specific conversion: unrar-free (Linux/Unix-like) or 7-Zip (Windows)
 * virtualenv
 
 ## Preparation
@@ -40,7 +43,7 @@ These tools able to be used without virtualenv although you will need to assess 
 Simply run the command as listed below. Directory argument is optional. If not passed, script will use current working directory.
 
 ```bash
-./conversion.py <Directory>
+./conversion.py -c --inputdir=<Directory>
 ```
 
 * **conversion-linux.py or conversion-win.py:**
