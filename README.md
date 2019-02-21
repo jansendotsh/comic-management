@@ -20,7 +20,8 @@ A script that reads ComicRack format tags from ComicTagger and sorts into approp
 ## Requirements
 
 * Python 3
-* unrar-free (Linux/Unix-like) or 7-Zip (Windows)
+* For OS-specific conversion: unrar-free (Linux/Unix-like) or 7-Zip (Windows)
+* For agonstic conversion: libunrar or [UnRARDLL.exe](http://www.rarlab.com/rar/UnRARDLL.exe), more info [here](https://www.rarlab.com/rar_add.htm)
 * virtualenv
 
 ## Preparation
@@ -34,6 +35,13 @@ A script that reads ComicRack format tags from ComicTagger and sorts into approp
 These tools able to be used without virtualenv although you will need to assess the versions of libraries used.
 
 ## Usage
+
+* **conversion.py**
+Simply run the command as listed below. Directory argument is optional. If not passed, script will use current working directory.
+
+```bash
+./conversion.py <Directory>
+```
 
 * **conversion-linux.py or conversion-win.py:**
 
