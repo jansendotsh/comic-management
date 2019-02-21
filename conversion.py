@@ -21,28 +21,58 @@ Options:
     The directory to search for files. If not set, will use current directory.
 '''
 
-def unpackRar(comicFile, dirPath):
-    if rarfile.is_rarfile(comicFile):
-        rar = rarfile.RarFile(comicFile)
-        os.mkdir(dirPath)
-        rar.extractall(dirPath)
-    else:
-        #Log error
-        return
+class conversion:
+    def unpackRar(comicFile, dirPath):
+        if rarfile.is_rarfile(comicFile):
+            rar = rarfile.RarFile(comicFile)
+            os.mkdir(dirPath)
+            rar.extractall(dirPath)
+        else:
+            #Log error
+            comicError(comicFile, "rarErr")
+            return
 
-def packZip(comicFile, dirPath):
-    zipped = zipfile.ZipFile(dirPath+".cbz", mode='w')
+    def packZip(comicFile, dirPath):
+        zipped = zipfile.ZipFile(dirPath+".cbz", mode='w')
 
-    if os.path.isdir(dirPath):
-        lenDirPath = len(dirPath)
-        for root, _, files in os.walk(dirPath):
-            for file in files:
-                filePath = os.path.join(root, file)
-                zipped.write(filePath, filePath[lenDirPath :])
-        zipped.close()
+        if os.path.isdir(dirPath):
+            lenDirPath = len(dirPath)
+            for root, _, files in os.walk(dirPath):
+                for file in files:
+                    filePath = os.path.join(root, file)
+                    zipped.write(filePath, filePath[lenDirPath :])
+            zipped.close()
+        else:
+            #Log error here as well?
+            return
+
+    def __init__(self):
+        for file in glob.glob("*.cbr"):
+            dirPath = os.path.splitext(file)[0]
+
+            unpackRar(file, dirPath)
+            packZip(file, dirPath)
+
+            # Integrity check and cleanup
+            if zipfile.is_zipfile(dirPath+".cbz"):
+                shutil.rmtree(os.path.splitext(file)[0])
+                os.remove(file)
+            else:
+                # Error on cleanup
+                return
+
+def comicError(comicFile, errType):
+    currentDT = str(datetime.datetime.now())
+    errorLogging = open("comicErr.log", "a+")
+
+    if errType == "tagErr":
+        errorLogging.write("%s - %s does not have tags, not successful\n" % (currentDT, comicFile))
+    elif errType == "emptyValueErr":
+        errorLogging.write("%s - %s has an empty tag field, review recommended\n" % (currentDT, comicFile))
+    elif errType == "rarErr"
+        errorLogging.write("%s - %s is an improper format\n" % (currentDT, comicFile))
     else:
-        #Log error here as well?
-        return
+        errorLogging.write("%s - %s experienced an unhandled error, review recommended\n" % (currentDT, comicFile))
 
 def main():
     try:
@@ -77,19 +107,7 @@ def main():
 
     # if taskConv, indent rest
     if taskConv:
-        for file in glob.glob("*.cbr"):
-            dirPath = os.path.splitext(file)[0]
-
-            unpackRar(file, dirPath)
-            packZip(file, dirPath)
-
-            # Integrity check and cleanup
-            if zipfile.is_zipfile(dirPath+".cbz"):
-                shutil.rmtree(os.path.splitext(file)[0])
-                os.remove(file)
-            else:
-                # Error on cleanup
-                return
-        
+        conversion()
+                
 if __name__ == '__main__':
    main() 
