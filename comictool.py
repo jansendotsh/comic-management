@@ -34,13 +34,13 @@ class conversion:
             os.mkdir(dirPath)
             rar.extractall(dirPath)
         else:
-            #Log error
             comicError(comicFile, "rarErr")
             return
 
     def packZip(self, comicFile, dirPath):
         zipped = zipfile.ZipFile(dirPath+".cbz", mode='w')
 
+        # Quick iteration to zip all extracted files
         if os.path.isdir(dirPath):
             lenDirPath = len(dirPath)
             for root, _, files in os.walk(dirPath):
@@ -50,6 +50,7 @@ class conversion:
             zipped.close()
         else:
             #Log error here as well?
+            comicError(file,"zipErr")
             return
 
     def __init__(self):
@@ -145,6 +146,8 @@ def comicError(comicFile, errType):
         errorLogging.write("%s - %s has an empty tag field, review recommended\n" % (currentDT, comicFile))
     elif errType == "rarErr":
         errorLogging.write("%s - %s is an improper format\n" % (currentDT, comicFile))
+    elif errType == "zipErr":
+        errorLogging.write("%s - %s did not zip correctly, review recommended\n" % (currentDT, comicFile))
     else:
         errorLogging.write("%s - %s experienced an unhandled error, review recommended\n" % (currentDT, comicFile))
 

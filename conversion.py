@@ -12,13 +12,19 @@ Usage:
 -c --convert
     Grab all CBR files in directory and convert them to CBZ format with checks
 
+-s --sort
+    Grab all tagged CBZ files in directory and move to proper stow
+
 -h --help
     Print this message
         
 Options:
 
 -i --inputdir=
-    The directory to search for files. If not set, will use current directory.
+    The directory to search for files. If not set, will use current directory
+
+-o --targetdir=
+    The directory to stow files in
 '''
 
 class conversion:
@@ -57,9 +63,77 @@ class conversion:
             if zipfile.is_zipfile(dirPath+".cbz"):
                 shutil.rmtree(os.path.splitext(file)[0])
                 os.remove(file)
+            
+            print("%s has been successfully converted.\n" % (file))
+
             else:
                 # Error on cleanup
                 return
+
+class sorting:
+    def comicParser(self, comicFile, finalRoot, workDir):
+        zipped = zipfile.ZipFile(comicFile)
+
+        # Extract ComicInfo.xml
+        for i in zipped.namelist():
+            if i.endswith("ComicInfo.xml"):
+                zipped.extract(i, workDir)
+        try:
+            comicInfo = untangle.parse("ComicInfo.xml").ComicInfo
+
+        except:
+            print("%s does not have proper tags.\n" % (comicFile))
+            comicError(comicFile, "tagErr")
+            return
+
+        # Set essential values
+        comicVolume = comicInfo.Volume.cdata
+        comicSeries = comicInfo.Series.cdata
+        comicNumber = comicInfo.Number.cdata
+        comicPublisher = comicInfo.Publisher.cdata
+        comicDate = datetime.date(int(comicInfo.Year.cdata), int(comicInfo.Month.cdata), 1)
+
+        # This is just to show that the values are working. Leaving while working on folder creation
+        print("Currently sorting %s of %s, published by %s in %s, %s.\n" % (comicNumber, comicSeries, comicPublisher, comicDate.strftime('%B'), comicDate.strftime('%Y')))
+
+        # Fixing series name conflicts
+        if comicSeries is not None:
+            comicSeries = comicSeries.replace(":", " -")
+            comicSeries = comicSeries.replace("/", "-")
+            comicSeries = comicSeries.replace("?", "")
+        
+        # Check variables, set empty to avoid errors while logging any missing tags
+        for tag in comicVolume, comicSeries, comicNumber, comicPublisher, comicDate:
+            try:
+                tag
+            except NameError:
+                tag = None
+                comicError(comicFile, "emptyValueErr")
+
+        # Create folder
+        comicPath = os.path.join(finalRoot, comicPublisher, comicSeries + " (" + comicVolume + ")")
+        comicName = comicSeries + " #" + comicNumber.zfill(3) + " (" + comicDate.strftime('%B, %Y') + ").cbz"
+
+        if not os.path.exists(comicPath):
+            try:
+                os.makedirs(comicPath)
+            except: 
+                print("An error occurred with creating %s" % (comicPath))
+                return
+
+        # Move file to newly formed folder
+        if not os.path.isfile(os.path.join(comicPath, comicName)):
+            shutil.move(os.path.abspath(comicFile), os.path.join(comicPath, comicName))
+
+        # Cleaning up ComicInfo.xml work is done
+        if os.path.isfile("ComicInfo.xml"):
+            os.remove("ComicInfo.xml")
+
+    def __init__(self):
+        for file in glob.glob("*.cbz"):
+            sorting.comicParser(self, file, outDir, workDir)
+
+            print("File stowed.\n")
 
 def comicError(comicFile, errType):
     currentDT = str(datetime.datetime.now())
@@ -76,13 +150,15 @@ def comicError(comicFile, errType):
 
 def main():
     try:
-        opts, args = getopt.getopt(argv[1:], "h:i:c", ["help", "inputdir=", "convert"])
+        opts, args = getopt.getopt(argv[1:], "h:io:cs", ["help", "inputdir=", "targetdir=", "convert", "sort"])
     except getopt.GetoptError as err:
         print(err)
         exit()
 
     workDir = None
+    targetDir = None
     taskConv = False
+    taskSort = False
 
     if len(argv) == 1:
         print("No options. Run with --help for more info.")
@@ -94,8 +170,12 @@ def main():
             exit()
         elif o in ("-i", "--inputdir"):
             workDir = a
+        elif o in ("-o", "--targetdir"):
+            outDir = a
         elif o in ("-c", "--convert"):
             taskConv = True
+        elif o in ("-s", "--sort"):
+            taskSort = True
         else:
             assert False, "unhandled option"
 
@@ -105,9 +185,17 @@ def main():
     except:
         workDir = os.getcwd()
 
-    # if taskConv, indent rest
     if taskConv:
         conversion()
+    
+    if taskSort:
+        try:
+            outDir
+        except:
+            print("Unable to sort without target directory set")
+            exit()
+        
+        sorting()
                 
 if __name__ == '__main__':
    main() 
