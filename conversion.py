@@ -22,7 +22,7 @@ Options:
 '''
 
 class conversion:
-    def unpackRar(comicFile, dirPath):
+    def unpackRar(self, comicFile, dirPath):
         if rarfile.is_rarfile(comicFile):
             rar = rarfile.RarFile(comicFile)
             os.mkdir(dirPath)
@@ -32,7 +32,7 @@ class conversion:
             comicError(comicFile, "rarErr")
             return
 
-    def packZip(comicFile, dirPath):
+    def packZip(self, comicFile, dirPath):
         zipped = zipfile.ZipFile(dirPath+".cbz", mode='w')
 
         if os.path.isdir(dirPath):
@@ -50,8 +50,8 @@ class conversion:
         for file in glob.glob("*.cbr"):
             dirPath = os.path.splitext(file)[0]
 
-            unpackRar(file, dirPath)
-            packZip(file, dirPath)
+            conversion.unpackRar(self, file, dirPath)
+            conversion.packZip(self, file, dirPath)
 
             # Integrity check and cleanup
             if zipfile.is_zipfile(dirPath+".cbz"):
@@ -69,7 +69,7 @@ def comicError(comicFile, errType):
         errorLogging.write("%s - %s does not have tags, not successful\n" % (currentDT, comicFile))
     elif errType == "emptyValueErr":
         errorLogging.write("%s - %s has an empty tag field, review recommended\n" % (currentDT, comicFile))
-    elif errType == "rarErr"
+    elif errType == "rarErr":
         errorLogging.write("%s - %s is an improper format\n" % (currentDT, comicFile))
     else:
         errorLogging.write("%s - %s experienced an unhandled error, review recommended\n" % (currentDT, comicFile))
