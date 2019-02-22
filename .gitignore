@@ -10,3 +10,6 @@ share/*
 lib64
 pyvenv.cfg
 .vscode/*
+Scripts/*
+tcl/*
+pip-selfcheck.json

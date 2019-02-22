@@ -24,7 +24,7 @@ Options:
     The directory to search for files. If not set, will use current directory
 
 -o --targetdir=
-    The directory to stow files in
+    The directory to sort files int
 '''
 
 class conversion:
@@ -34,13 +34,13 @@ class conversion:
             os.mkdir(dirPath)
             rar.extractall(dirPath)
         else:
-            #Log error
             comicError(comicFile, "rarErr")
             return
 
     def packZip(self, comicFile, dirPath):
         zipped = zipfile.ZipFile(dirPath+".cbz", mode='w')
 
+        # Quick iteration to zip all extracted files
         if os.path.isdir(dirPath):
             lenDirPath = len(dirPath)
             for root, _, files in os.walk(dirPath):
@@ -50,6 +50,7 @@ class conversion:
             zipped.close()
         else:
             #Log error here as well?
+            comicError(file,"zipErr")
             return
 
     def __init__(self):
@@ -64,14 +65,14 @@ class conversion:
                 shutil.rmtree(os.path.splitext(file)[0])
                 os.remove(file)
             
-            print("%s has been successfully converted.\n" % (file))
-
             else:
                 # Error on cleanup
                 return
 
+            print("%s has been successfully converted.\n" % (file))
+
 class sorting:
-    def comicParser(self, comicFile, finalRoot, workDir):
+    def comicParser(self, comicFile, targetDir, workDir):
         zipped = zipfile.ZipFile(comicFile)
 
         # Extract ComicInfo.xml
@@ -111,7 +112,7 @@ class sorting:
                 comicError(comicFile, "emptyValueErr")
 
         # Create folder
-        comicPath = os.path.join(finalRoot, comicPublisher, comicSeries + " (" + comicVolume + ")")
+        comicPath = os.path.join(targetDir, comicPublisher, comicSeries + " (" + comicVolume + ")")
         comicName = comicSeries + " #" + comicNumber.zfill(3) + " (" + comicDate.strftime('%B, %Y') + ").cbz"
 
         if not os.path.exists(comicPath):
@@ -129,9 +130,9 @@ class sorting:
         if os.path.isfile("ComicInfo.xml"):
             os.remove("ComicInfo.xml")
 
-    def __init__(self):
+    def __init__(self, targetDir, workDir):
         for file in glob.glob("*.cbz"):
-            sorting.comicParser(self, file, outDir, workDir)
+            sorting.comicParser(self, file, targetDir, workDir)
 
             print("File stowed.\n")
 
@@ -145,6 +146,8 @@ def comicError(comicFile, errType):
         errorLogging.write("%s - %s has an empty tag field, review recommended\n" % (currentDT, comicFile))
     elif errType == "rarErr":
         errorLogging.write("%s - %s is an improper format\n" % (currentDT, comicFile))
+    elif errType == "zipErr":
+        errorLogging.write("%s - %s did not zip correctly, review recommended\n" % (currentDT, comicFile))
     else:
         errorLogging.write("%s - %s experienced an unhandled error, review recommended\n" % (currentDT, comicFile))
 
@@ -171,7 +174,7 @@ def main():
         elif o in ("-i", "--inputdir"):
             workDir = a
         elif o in ("-o", "--targetdir"):
-            outDir = a
+            targetDir = a
         elif o in ("-c", "--convert"):
             taskConv = True
         elif o in ("-s", "--sort"):
@@ -189,13 +192,14 @@ def main():
         conversion()
     
     if taskSort:
+        # Maybe pull environ variable to alleviate consistent use? os.environ['COMICTARGET'] would work
         try:
-            outDir
+            targetDir
         except:
             print("Unable to sort without target directory set")
             exit()
-        
-        sorting()
+
+        sorting(targetDir, workDir)
                 
 if __name__ == '__main__':
    main() 
