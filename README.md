@@ -5,14 +5,14 @@
 
 This is a repository with a series of tools that are built to help with sorting and managing digital comic book files (.cbr, .cbz). Of these tools are the following:
 
+* **comictool.py:**
+A script that unifies all functions of this pack, allowing greater automation. Currently, this script only includes converting and sorting of files. 
+
 * **conversion.py:**
 A script for converting CBR files to CBZ. *Should* work across platform yet has only been tested on Linux.
 
-* **conversion-linux.py:**
-A small script that converts CBR files to CBZ on Linux and Unix-like systems using unrar-free.
-
-* **conversion-win.py:**
-A similar small script that converts CBR files to CBZ on Windows systems using the 7-Zip executable.
+* **conversion-linux.py & conversion-win.py:**
+Two small scripts for simple conversion using subprocess calls to the unrar-nonfree (on Linux or Unix-like systems) or 7-Zip (on Windows systems).
 
 * **comictagger:**
 An existing comic tagging library that interfaces with ComicVine's API and tags in an XML file. More information is available [here](https://github.com/davide-romanini/comictagger/).
@@ -35,9 +35,44 @@ A script that reads ComicRack format tags from ComicTagger and sorts into approp
 * `source bin/activate`
 * `python3 -m pip install -r requirements.txt`
 
-These tools able to be used without virtualenv although you will need to assess the versions of libraries used.
+If using without virtualenv, you may experience issues 
 
 ## Usage
+
+* **comictool.py:**
+Based on what you want to use the tool for, you can choose the arguments. Help text is printing below:
+
+```markdown
+A script for converting CBR files to a CBZ format for openness.
+
+Usage:
+
+-c --convert
+    Grab all CBR files in directory and convert them to CBZ format with checks
+
+-s --sort
+    Grab all tagged CBZ files in directory and move to proper stow
+
+-h --help
+    Print this message
+        
+Options:
+
+-i --inputdir=
+    The directory to search for files. If not set, will use current directory
+
+-o --targetdir=
+    The directory to sort files into
+```
+
+Examples of usage would be as follows:
+```bash
+# For converting files:
+./comictool.py -c -i /home/source/unsorted-comics
+
+# For sorting and stowing files:
+./comictool.py -s -i /home/source/unsorted-comics -o /home/source/Documents/Comics
+```
 
 * **conversion.py**
 Simply run the command as listed below. Directory argument is optional. If not passed, script will use current working directory.

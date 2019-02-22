@@ -24,7 +24,7 @@ Options:
     The directory to search for files. If not set, will use current directory
 
 -o --targetdir=
-    The directory to stow files in
+    The directory to sort files int
 '''
 
 class conversion:
