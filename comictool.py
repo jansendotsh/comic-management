@@ -81,14 +81,14 @@ class tagging:
     ctopts = Options()
     ctsettings = ComicTaggerSettings()
 
-    def tagger(self, comicFile):
+    def tagger(self, comicFile, comicVineKey):
         ctopts = tagging.ctopts
         ctsettings = tagging.ctsettings
 
         # Setting comictagger options for cli_mode invocation
         ctopts.no_gui = True
         ctopts.save_tags = True
-        #ctopts.cv_api_key = comicVineKey
+        ctopts.cv_api_key = comicVineKey
         ctopts.data_style = MetaDataStyle.CIX
         ctopts.search_online = True
         ctopts.verbose = True
@@ -101,12 +101,7 @@ class tagging:
         ctopts = tagging.ctopts        
         ctsettings = tagging.ctsettings
 
-        ctopts = Options()
-        ctsettings = ComicTaggerSettings()
-
-        if comicVineKey:
-            ctopts.cv_api_key = comicVineKey
-
+        if comicVineKey is not None:
             if ctopts.cv_api_key != ctsettings.cv_api_key:
                 ctsettings.cv_api_key = ctopts.cv_api_key
                 ctsettings.save()
@@ -115,7 +110,8 @@ class tagging:
             exit()
             
         for file in glob.glob("*.cbz"):
-            tagging.tagger(file, comicVineKey)
+            print(file)
+            tagging.tagger(self, file, comicVineKey)
 
 class sorting:
     def comicParser(self, comicFile, targetDir, workDir):
