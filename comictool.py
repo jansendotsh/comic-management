@@ -4,26 +4,32 @@ import glob, os, shutil, zipfile, untangle, datetime, getopt
 from sys import argv
 from unrar import rarfile
 
+# comictagger library tools
+from comictaggerlib.options import Options
+from comictaggerlib.settings import ComicTaggerSettings
+from comictaggerlib.comicarchive import MetaDataStyle
+from comictaggerlib import cli
+
 helpText ='''
 A script for converting CBR files to a CBZ format for openness.
 
 Usage:
 
--c --convert
+-c, --convert
     Grab all CBR files in directory and convert them to CBZ format with checks
 
--s --sort
+-s, --sort
     Grab all tagged CBZ files in directory and move to proper stow
 
--h --help
+-h, --help
     Print this message
         
 Options:
 
--i --inputdir=
+-i, --inputdir=
     The directory to search for files. If not set, will use current directory
 
--o --targetdir=
+-o, --targetdir=
     The directory to sort files int
 '''
 
@@ -70,6 +76,46 @@ class conversion:
                 return
 
             print("%s has been successfully converted.\n" % (file))
+
+class tagging:
+    ctopts = Options()
+    ctsettings = ComicTaggerSettings()
+
+    def tagger(self, comicFile):
+        ctopts = tagging.ctopts
+        ctsettings = tagging.ctsettings
+
+        # Setting comictagger options for cli_mode invocation
+        ctopts.no_gui = True
+        ctopts.save_tags = True
+        #ctopts.cv_api_key = comicVineKey
+        ctopts.data_style = MetaDataStyle.CIX
+        ctopts.search_online = True
+        ctopts.verbose = True
+        ctopts.parse_filename = True
+        ctopts.interactive = True
+        ctopts.file_list = [comicFile]
+        cli.cli_mode(ctopts, ctsettings)
+
+    def __init__(self, comicVineKey):
+        ctopts = tagging.ctopts        
+        ctsettings = tagging.ctsettings
+
+        ctopts = Options()
+        ctsettings = ComicTaggerSettings()
+
+        if comicVineKey:
+            ctopts.cv_api_key = comicVineKey
+
+            if ctopts.cv_api_key != ctsettings.cv_api_key:
+                ctsettings.cv_api_key = ctopts.cv_api_key
+                ctsettings.save()
+        else:
+            print("No ComicVine API key provided!")
+            exit()
+            
+        for file in glob.glob("*.cbz"):
+            tagging.tagger(file, comicVineKey)
 
 class sorting:
     def comicParser(self, comicFile, targetDir, workDir):
@@ -153,14 +199,16 @@ def comicError(comicFile, errType):
 
 def main():
     try:
-        opts, args = getopt.getopt(argv[1:], "h:io:cs", ["help", "inputdir=", "targetdir=", "convert", "sort"])
+        opts, args = getopt.getopt(argv[1:], "h:io:cts", ["help", "inputdir=", "targetdir=", "comicvinekey=", "convert", "tag", "sort"])
     except getopt.GetoptError as err:
         print(err)
         exit()
 
     workDir = None
     targetDir = None
+    comicVineKey = None
     taskConv = False
+    taskTag = False
     taskSort = False
 
     if len(argv) == 1:
@@ -175,8 +223,12 @@ def main():
             workDir = a
         elif o in ("-o", "--targetdir"):
             targetDir = a
+        elif o in ("--comicvinekey"):
+            comicVineKey = a
         elif o in ("-c", "--convert"):
             taskConv = True
+        elif o in ("-t", "--tag"):
+            taskTag = True
         elif o in ("-s", "--sort"):
             taskSort = True
         else:
@@ -190,6 +242,9 @@ def main():
 
     if taskConv:
         conversion()
+    
+    if taskTag:
+        tagging(comicVineKey)
     
     if taskSort:
         # Maybe pull environ variable to alleviate consistent use? os.environ['COMICTARGET'] would work
