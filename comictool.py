@@ -18,6 +18,9 @@ Usage:
 -c, --convert
     Grab all CBR files in directory and convert them to CBZ format with checks
 
+-t, --tag
+    Automatically try to grab tags from ComicVine database and save them to the file, may be interactive
+    
 -s, --sort
     Grab all tagged CBZ files in directory and move to proper stow
 
@@ -31,6 +34,9 @@ Options:
 
 -o, --targetdir=
     The directory to sort files int
+
+--comicvine=
+    ComicVine API key for use with 
 '''
 
 class conversion:
@@ -219,7 +225,7 @@ def main():
             workDir = a
         elif o in ("-o", "--targetdir"):
             targetDir = a
-        elif o in ("--comicvinekey"):
+        elif o == "--comicvine":
             comicVineKey = a
         elif o in ("-c", "--convert"):
             taskConv = True
@@ -236,7 +242,6 @@ def main():
     except:
         workDir = os.getcwd()
 
-    print("%s %s %s" % (taskConv, taskTag, taskSort))
     if taskConv:
         conversion()
     
