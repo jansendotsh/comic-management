@@ -206,7 +206,7 @@ def main():
     taskConv = False
     taskTag = False
     taskSort = False
-
+    
     if len(argv) == 1:
         print("No options. Run with --help for more info.")
         exit()
@@ -236,6 +236,7 @@ def main():
     except:
         workDir = os.getcwd()
 
+    print("%s %s %s" % (taskConv, taskTag, taskSort))
     if taskConv:
         conversion()
     
@@ -244,9 +245,7 @@ def main():
     
     if taskSort:
         # Maybe pull environ variable to alleviate consistent use? os.environ['COMICTARGET'] would work
-        try:
-            targetDir
-        except:
+        if targetDir is None:
             print("Unable to sort without target directory set")
             exit()
 
