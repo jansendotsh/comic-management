@@ -4,27 +4,39 @@ import glob, os, shutil, zipfile, untangle, datetime, getopt
 from sys import argv
 from unrar import rarfile
 
+# comictagger library tools
+from comictaggerlib.options import Options
+from comictaggerlib.settings import ComicTaggerSettings
+from comictaggerlib.comicarchive import MetaDataStyle
+from comictaggerlib import cli
+
 helpText ='''
-A script for converting CBR files to a CBZ format for openness.
+A script for batch managing comic books. Can convert to CBZ, automatically tag from ComicVine and sort into a folder.
 
 Usage:
 
--c --convert
+-c, --convert
     Grab all CBR files in directory and convert them to CBZ format with checks
 
--s --sort
+-t, --tag
+    Automatically try to grab tags from ComicVine database and save them to the file, may be interactive
+
+-s, --sort
     Grab all tagged CBZ files in directory and move to proper stow
 
--h --help
+-h, --help
     Print this message
         
 Options:
 
--i --inputdir=
+-i, --inputdir=
     The directory to search for files. If not set, will use current directory
 
--o --targetdir=
+-o, --targetdir=
     The directory to sort files int
+
+--comicvine=
+    ComicVine API key for use with online tagging
 '''
 
 class conversion:
@@ -70,6 +82,42 @@ class conversion:
                 return
 
             print("%s has been successfully converted.\n" % (file))
+
+class tagging:
+    ctopts = Options()
+    ctsettings = ComicTaggerSettings()
+
+    def tagger(self, comicFile, comicVineKey):
+        ctopts = tagging.ctopts
+        ctsettings = tagging.ctsettings
+
+        # Setting comictagger options for cli_mode invocation
+        ctopts.no_gui = True
+        ctopts.save_tags = True
+        ctopts.cv_api_key = comicVineKey
+        ctopts.data_style = MetaDataStyle.CIX
+        ctopts.search_online = True
+        ctopts.verbose = True
+        ctopts.parse_filename = True
+        ctopts.interactive = True
+        ctopts.file_list = [comicFile]
+        cli.cli_mode(ctopts, ctsettings)
+
+    def __init__(self, comicVineKey):
+        ctopts = tagging.ctopts        
+        ctsettings = tagging.ctsettings
+
+        if comicVineKey is not None:
+            if ctopts.cv_api_key != ctsettings.cv_api_key:
+                ctsettings.cv_api_key = ctopts.cv_api_key
+                ctsettings.save()
+        else:
+            print("No ComicVine API key provided!")
+            exit()
+            
+        for file in glob.glob("*.cbz"):
+            print(file)
+            tagging.tagger(self, file, comicVineKey)
 
 class sorting:
     def comicParser(self, comicFile, targetDir, workDir):
@@ -153,16 +201,18 @@ def comicError(comicFile, errType):
 
 def main():
     try:
-        opts, args = getopt.getopt(argv[1:], "h:io:cs", ["help", "inputdir=", "targetdir=", "convert", "sort"])
+        opts, args = getopt.getopt(argv[1:], "h:io:cts", ["help", "inputdir=", "targetdir=", "comicvinekey=", "convert", "tag", "sort"])
     except getopt.GetoptError as err:
         print(err)
         exit()
 
     workDir = None
     targetDir = None
+    comicVineKey = None
     taskConv = False
+    taskTag = False
     taskSort = False
-
+    
     if len(argv) == 1:
         print("No options. Run with --help for more info.")
         exit()
@@ -175,8 +225,12 @@ def main():
             workDir = a
         elif o in ("-o", "--targetdir"):
             targetDir = a
+        elif o == "--comicvine":
+            comicVineKey = a
         elif o in ("-c", "--convert"):
             taskConv = True
+        elif o in ("-t", "--tag"):
+            taskTag = True
         elif o in ("-s", "--sort"):
             taskSort = True
         else:
@@ -191,11 +245,12 @@ def main():
     if taskConv:
         conversion()
     
+    if taskTag:
+        tagging(comicVineKey)
+    
     if taskSort:
         # Maybe pull environ variable to alleviate consistent use? os.environ['COMICTARGET'] would work
-        try:
-            targetDir
-        except:
+        if targetDir is None:
             print("Unable to sort without target directory set")
             exit()
 
