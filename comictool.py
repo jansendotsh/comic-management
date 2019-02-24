@@ -11,7 +11,7 @@ from comictaggerlib.comicarchive import MetaDataStyle
 from comictaggerlib import cli
 
 helpText ='''
-A script for converting CBR files to a CBZ format for openness.
+A script for batch managing comic books. Can convert to CBZ, automatically tag from ComicVine and sort into a folder.
 
 Usage:
 
@@ -20,7 +20,7 @@ Usage:
 
 -t, --tag
     Automatically try to grab tags from ComicVine database and save them to the file, may be interactive
-    
+
 -s, --sort
     Grab all tagged CBZ files in directory and move to proper stow
 
@@ -36,7 +36,7 @@ Options:
     The directory to sort files int
 
 --comicvine=
-    ComicVine API key for use with 
+    ComicVine API key for use with online tagging
 '''
 
 class conversion:

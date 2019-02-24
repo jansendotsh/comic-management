@@ -35,7 +35,7 @@ A script that reads ComicRack format tags from ComicTagger and sorts into approp
 * `source bin/activate`
 * `python3 -m pip install -r requirements.txt`
 
-If using without virtualenv, you may experience issues 
+If using without virtualenv, you may experience issues although can work normally.
 
 ## Usage
 
@@ -43,26 +43,32 @@ If using without virtualenv, you may experience issues
 Based on what you want to use the tool for, you can choose the arguments. Help text is printing below:
 
 ```markdown
-A script for converting CBR files to a CBZ format for openness.
+A script for batch managing comic books. Can convert to CBZ, automatically tag from ComicVine and sort into a folder.
 
 Usage:
 
--c --convert
+-c, --convert
     Grab all CBR files in directory and convert them to CBZ format with checks
 
--s --sort
+-t, --tag
+    Automatically try to grab tags from ComicVine database and save them to the file, may be interactive
+
+-s, --sort
     Grab all tagged CBZ files in directory and move to proper stow
 
--h --help
+-h, --help
     Print this message
         
 Options:
 
--i --inputdir=
+-i, --inputdir=
     The directory to search for files. If not set, will use current directory
 
--o --targetdir=
-    The directory to sort files into
+-o, --targetdir=
+    The directory to sort files int
+
+--comicvine=
+    ComicVine API key for use with online tagging
 ```
 
 Examples of usage would be as follows:
@@ -70,18 +76,21 @@ Examples of usage would be as follows:
 # For converting files:
 ./comictool.py -c -i /home/source/unsorted-comics
 
+# For tagging: 
+./comictool.py -t /home/source/unsorted-comics
+
 # For sorting and stowing files:
 ./comictool.py -s -i /home/source/unsorted-comics -o /home/source/Documents/Comics
 ```
 
-* **conversion.py**
+* **conversion.py (will be removed)**
 Simply run the command as listed below. Directory argument is optional. If not passed, script will use current working directory.
 
 ```bash
 ./conversion.py -c --inputdir=<Directory>
 ```
 
-* **conversion-linux.py or conversion-win.py:**
+* **conversion-linux.py or conversion-win.py (will be removed):**
 
 Both scripts will be used similarly with the following command:
 
@@ -105,7 +114,7 @@ A ComicVine API key can be obtained [here](https://comicvine.gamespot.com/api/).
 
 Additional features and usage can be found in ComicTagger's [Wiki](https://github.com/davide-romanini/comictagger/wiki/UserGuide#cli-user-guide).
 
-* **filesorting.py**
+* **filesorting.py (will be removed)**
 
 To sort files, you can use a similarly formatted request to the conversion script:
 
