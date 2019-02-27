@@ -201,7 +201,7 @@ def comicError(comicFile, errType):
 
 def main():
     try:
-        opts, args = getopt.getopt(argv[1:], "h:io:cts", ["help", "inputdir=", "targetdir=", "comicvinekey=", "convert", "tag", "sort"])
+        opts, args = getopt.getopt(argv[1:], "h:io:cts", ["help", "inputdir=", "targetdir=", "comicvine=", "convert", "tag", "sort"])
     except getopt.GetoptError as err:
         print(err)
         exit()
