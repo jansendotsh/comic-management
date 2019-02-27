@@ -101,7 +101,11 @@ class tagging:
         ctopts.parse_filename = True
         ctopts.interactive = True
         ctopts.file_list = [comicFile]
-        cli.cli_mode(ctopts, ctsettings)
+
+        try:
+            cli.cli_mode(ctopts, ctsettings)
+        except:
+            comicError(comicFile,"ctErr")
 
     def __init__(self, comicVineKey):
         ctopts = tagging.ctopts        
@@ -190,10 +194,12 @@ def comicError(comicFile, errType):
 
     if errType == "tagErr":
         errorLogging.write("%s - %s does not have tags, not successful\n" % (currentDT, comicFile))
+    elif errType == "ctErr":
+        errorLogging.write("%s - %s was unable to be tagged by comictagger, review recommended\n" % (currentDT, comicFile))
     elif errType == "emptyValueErr":
         errorLogging.write("%s - %s has an empty tag field, review recommended\n" % (currentDT, comicFile))
     elif errType == "rarErr":
-        errorLogging.write("%s - %s is an improper format\n" % (currentDT, comicFile))
+        errorLogging.write("%s - %s is not a proper RAR file\n" % (currentDT, comicFile))
     elif errType == "zipErr":
         errorLogging.write("%s - %s did not zip correctly, review recommended\n" % (currentDT, comicFile))
     else:
